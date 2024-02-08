@@ -3,12 +3,13 @@ const http = require('http');
 const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
-const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const Message = require('./models/Message');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-const Message = require('./models/Message');
 
 // MongoDB Atlas connection string
 // const mongoDBAtlasUri = 'mongodb+srv://richard:lsz190166134@chatdb.vq15ixf.mongodb.net/?retryWrites=true&w=majority';
@@ -27,29 +28,34 @@ app.use('/api/auth', authRoutes);
 app.use(express.static('public'));
 app.get('/', (req, res) => {
   res.send('Chat server is running');
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 // Socket.io connection
 io.on('connection', (socket) => {
     console.log('a user connected');
 
-    socket.on('joinRoom', (room) => {
-        socket.join(room);
-        console.log(`User joined room: ${room}`);
+    socket.on('joinRoom', async ({ username, room }) => {
+      socket.join(room);
+      const messages = await Message.find({ room }).sort('date_sent');
+      socket.emit('historyMessages', messages); // 确保这一行在你的代码中
     });
+  
 
     socket.on('chatMessage', async ({ room, message }) => {
-        const newMessage = new Message({
-            from_user: socket.id, // Use the socket ID as the user's ID
-            room,
-            message
-        });
-
+        console.log(message); 
         try {
-            await newMessage.save();
+            const newMessage = new Message({
+                from_user: socket.id, // Use the socket ID as the user's ID
+                room,
+                message
+            });
+
+            const msg = await Message.create({ from_user: socket.id, room, message });
+
             io.to(room).emit('chatMessage', message); // Broadcast the message to everyone in the room
-        } catch (error) {
-            console.error('Message Save Error', error);
+          } catch (error) {
+            console.error('Message save error:', error);
         }
     });
 

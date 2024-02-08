@@ -2,7 +2,7 @@ const socket = io(); // Connect to the server
 
 // Join a room
 const room = 'SomeRoomName';
-socket.emit('joinRoom', room);
+socket.emit('joinRoom', { username: "Username", room: "Roomname" });
 
 // Send a message
 document.getElementById('messageForm').addEventListener('submit', function(e) {
@@ -11,6 +11,20 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     socket.emit('chatMessage', { message, room });
     document.getElementById('messageInput').value = '';
 });
+
+// Load the chat history
+socket.on('historyMessages', function(messages) {
+    const chatWindow = document.getElementById('chatWindow');
+    // Clear the chat window
+    chatWindow.innerHTML = '';
+    // Add each message to the chat window
+    messages.forEach(function(msg) {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = `${msg.from_user}: ${msg.message}`;
+        chatWindow.appendChild(messageDiv);
+    });
+});
+
 
 // Add a new message to the chat window
 socket.on('chatMessage', function(msg) {
