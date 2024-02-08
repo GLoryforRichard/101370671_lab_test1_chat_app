@@ -3,17 +3,17 @@ document.addEventListener('DOMContentLoaded', function() {
     signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // 获取表单数据
+        // Access the form data
         const username = document.getElementById('username').value;
         const firstname = document.getElementById('firstname').value;
         const lastname = document.getElementById('lastname').value;
         const password = document.getElementById('password').value;
 
-        // 构造请求体
+        // Build the request body
         const requestBody = { username, firstname, lastname, password };
 
         try {
-            // 发送请求到后端的注册API
+            // Send the request
             const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: {
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.status === 201) {
                 const responseData = await response.json();
                 alert('Registration successful');
-                window.location.href = '/login.html'; // 注册成功后重定向到登录页面
+                window.location.href = '/login.html'; // Redirect to login page
             } else {
                 let errorMessage = 'Registration failed. Please try again.';
                 if (response.headers.get('Content-Type')?.includes('application/json')) {
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     alert(errorMessage);
             }
         } catch (error) {
-            // 网络或解析错误的处理
+            // Network errors, CORS errors, etc.
             console.error('Registration error:', error);
             alert('Registration failed. Please try again.');
         }

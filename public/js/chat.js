@@ -12,9 +12,11 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     document.getElementById('messageInput').value = '';
 });
 
-// Add the message to the chat window
+// Add a new message to the chat window
 socket.on('chatMessage', function(msg) {
     const messageDiv = document.createElement('div');
-    messageDiv.textContent = msg.message;
+    messageDiv.textContent = msg; // Insert the message text into the div
     document.getElementById('chatWindow').appendChild(messageDiv);
 });
+
+

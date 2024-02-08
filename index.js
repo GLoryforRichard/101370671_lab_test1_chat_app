@@ -5,10 +5,10 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+const Message = require('./models/Message');
 
 // MongoDB Atlas connection string
 // const mongoDBAtlasUri = 'mongodb+srv://richard:lsz190166134@chatdb.vq15ixf.mongodb.net/?retryWrites=true&w=majority';
@@ -38,8 +38,19 @@ io.on('connection', (socket) => {
         console.log(`User joined room: ${room}`);
     });
 
-    socket.on('chatMessage', (msg) => {
-        io.to(msg.room).emit('chatMessage', msg);
+    socket.on('chatMessage', async ({ room, message }) => {
+        const newMessage = new Message({
+            from_user: socket.id, // Use the socket ID as the user's ID
+            room,
+            message
+        });
+
+        try {
+            await newMessage.save();
+            io.to(room).emit('chatMessage', message); // Broadcast the message to everyone in the room
+        } catch (error) {
+            console.error('Message Save Error', error);
+        }
     });
 
     socket.on('disconnect', () => {
