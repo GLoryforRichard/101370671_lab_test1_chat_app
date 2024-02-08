@@ -11,7 +11,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // MongoDB Atlas connection string
-const mongoDBAtlasUri = 'mongodb+srv://richard:lsz190166134@chatdb.vq15ixf.mongodb.net/?retryWrites=true&w=majority';
+// const mongoDBAtlasUri = 'mongodb+srv://richard:lsz190166134@chatdb.vq15ixf.mongodb.net/?retryWrites=true&w=majority';
 
 // connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI, {
@@ -27,12 +27,22 @@ app.get('/', (req, res) => {
   res.send('Chat server is running');
 });
 
+// Socket.io connection
 io.on('connection', (socket) => {
-  console.log('New client connected');
+    console.log('a user connected');
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
+    socket.on('joinRoom', (room) => {
+        socket.join(room);
+        console.log(`User joined room: ${room}`);
+    });
+
+    socket.on('chatMessage', (msg) => {
+        io.to(msg.room).emit('chatMessage', msg);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
 });
 
 const PORT = process.env.PORT || 3000;
