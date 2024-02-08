@@ -11,11 +11,11 @@
 ## Chat Room
 ![image](https://github.com/GLoryforRichard/101370671_lab_test1_chat_app/assets/44072670/a2bad21c-ba9e-4039-9abb-884e2ed876e8)
 
-'''
+```
 npm init
-'''
+```
 
-'''
+```
 npm start
-'''
+```
 
