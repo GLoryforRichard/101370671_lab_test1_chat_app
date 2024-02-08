@@ -25,6 +25,8 @@ socket.on('historyMessages', function(messages) {
     });
 });
 
+// Request chat history from the server
+socket.emit('requestHistory', room);
 
 // Add a new message to the chat window
 socket.on('chatMessage', function(msg) {
@@ -32,5 +34,3 @@ socket.on('chatMessage', function(msg) {
     messageDiv.textContent = msg; // Insert the message text into the div
     document.getElementById('chatWindow').appendChild(messageDiv);
 });
-
-

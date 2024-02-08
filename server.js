@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
     socket.on('joinRoom', async ({ username, room }) => {
       socket.join(room);
       const messages = await Message.find({ room }).sort('date_sent');
-      socket.emit('historyMessages', messages); // 确保这一行在你的代码中
+      socket.emit('historyMessages', messages);
     });
   
 
@@ -53,7 +53,11 @@ io.on('connection', (socket) => {
 
             const msg = await Message.create({ from_user: socket.id, room, message });
 
-            io.to(room).emit('chatMessage', message); // Broadcast the message to everyone in the room
+            io.to(room).emit('chatMessage', {
+                from_user: socket.id,
+                room,
+                message
+            }); // Broadcast the message to everyone in the room
           } catch (error) {
             console.error('Message save error:', error);
         }
